@@ -1,0 +1,55 @@
+% Define the source folder path
+sourceFolder_me = '/home/erfan/camcan/Results/source/';
+sourceFolder_ver=[sourceFolder 'veronika/'];
+
+allSourceData =[];
+
+for sourceFolder=[sourceFolder_ver, sourceFolder_me]
+
+% Get a list of all directories in the source folder
+dirList = dir(sourceFolder);
+dirList = dirList([dirList.isdir]);
+dirList = dirList(~ismember({dirList.name}, {'.', '..'}));
+
+
+% Preallocate the matrix to store all the source ROI data
+
+
+% Loop through each directory
+for i = 1:numel(dirList)
+    % Get the current directory path
+    currentDir = fullfile(sourceFolder, dirList(i).name);
+    
+    % Load the source_roi_data field
+    load(fullfile(currentDir, 'source_rec_results.mat'), 'source_roi_data');
+
+    if size(source_roi_data,1)>85
+        source_roi_data = source_roi_data(1:3:end,:,1:10);
+    else
+        source_roi_data = source_roi_data(1:68,:,1:10);
+    end
+    %make the data 2d by reshaping
+    source_roi_data = reshape(source_roi_data, 1,  size(source_roi_data,1) *size(source_roi_data,2)*size(source_roi_data,3));
+    %print the source_roi_data size
+    disp(size(source_roi_data));
+
+    % Append the current source ROI data to the matrix
+    allSourceData(:, i) = source_roi_data;
+end
+end
+% Calculate the covariance matrix
+covarianceMatrix = corrcoef(allSourceData);
+
+% Plot the covariance matrix
+figure;
+imagesc(covarianceMatrix);
+colorbar;
+title('Covariance Matrix - All Source ROI Data');
+
+% Save the plot
+saveas(gcf, fullfile(sourceFolder, 'covariance_plot.png'));
+
+% Close the figure
+close(gcf);
+% Save the covariance matrix as a .mat file
+save(fullfile(sourceFolder, 'covariance_matrix.mat'), 'covarianceMatrix');
