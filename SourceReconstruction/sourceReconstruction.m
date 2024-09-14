@@ -69,49 +69,98 @@ frqs = linspace(0, settings.target_fs/2, nsam/2+1)';
 nbootstrap = 0;
 
 % ROI labels
-labels_cortex= {Mixed_cortex_lowres.Atlas(4).Scouts.Label};
-Labels_subcortex= {Mixed_cortex_lowres.Atlas(8).Scouts.Label};
+labels_cortex= {Mixed_cortex.Atlas(4).Scouts.Label};
+Labels_subcortex= {Mixed_cortex.Atlas(8).Scouts.Label};
 %remove the cortex 
-removeIdx = strcmp(Labels_subcortex, 'Cortex R') | strcmp(Labels_subcortex, 'Cortex L');
-Mixed_cortex_lowres.Atlas(8).Scouts(removeIdx) = [];
 
-Labels_subcortex= {Mixed_cortex_lowres.Atlas(8).Scouts.Label};
-% number of ROIs in the Desikan-Kiliany Atlas and subcortical 
-nROI_cortex = length(Mixed_cortex_lowres.Atlas(4).Scouts);
-nROI_subcortex = length(Mixed_cortex_lowres.Atlas(8).Scouts);
-nROI = nROI_subcortex+nROI_cortex;
+leftcortex=GridAtlas.Scouts(10);
+rightcortex=GridAtlas.Scouts(11);
+nROI_cortex=68;
+nROI_subcortex=17;
+dk=Mixed_cortex.Atlas(4).Scouts;
 
-ind_subcortex = [];
-ind_roi_sub= {};
+ind_roi={};
+ind_cortex=[];
+
+for iroi=1:2:68
+ind_roi{iroi}=dk(iroi).Vertices;
+[~,ind_roi{iroi}]=ismember(ind_roi{iroi},leftcortex.Vertices);
+ind_roi{iroi}=leftcortex.GridRows(ind_roi{iroi});
+ind_cortex=cat(2,ind_cortex,ind_roi{iroi});
+end
+
+
+for iroi=2:2:68
+ind_roi{iroi}=dk(iroi).Vertices;
+[~,ind_roi{iroi}]=ismember(ind_roi{iroi},rightcortex.Vertices);
+ind_roi{iroi}=rightcortex.GridRows(ind_roi{iroi});
+ind_cortex=cat(2,ind_cortex,ind_roi{iroi});
+end
+
+ind_roi_sub={};
+ind_subcortex=[];
+
+%remove left and right cortex from headmodel.GridAtlas.Scouts
+GridAtlas.Scouts(10:11)=[];
+
+for iroi=1:length(GridAtlas.Scouts)
+ind_roi_sub{iroi}=GridAtlas.Scouts(iroi).GridRows;
+ind_subcortex=cat(2,ind_subcortex,ind_roi_sub{iroi});
+end
+
+ind=cat(2,ind_cortex,ind_subcortex);
 
 for iROI = 1:nROI_subcortex
-      ind_roi_sub{iROI} = Mixed_cortex_lowres.Atlas(8).Scouts(iROI).Vertices;
-      ind_subcortex = cat(2, ind_subcortex, ind_roi_sub{iROI});
-      % [~, ind_roi_subcortex{iROI}, ~] = intersect(ind_subcortex, ind_roi_sub{iROI});
-end
-
-ind_cortex = [];
-ind_roi = {};
-for iROI = 1:nROI_cortex
-  ind_roi{iROI} = Mixed_cortex_lowres.Atlas(4).Scouts(iROI).Vertices;
-  ind_cortex = cat(2, ind_cortex, ind_roi{iROI});
-  % [~, ind_roi_cortex{iROI}, ~] = intersect(ind_cortex, ind_roi{iROI});
-end
-
-ind=cat(2,ind_subcortex,ind_cortex);
-
-%indices should be extracted from concatination of vertices indices 
-for iROI = 1:nROI_subcortex
-      [~, ind_roi_subcortex{iROI}, ~] = intersect(ind, ind_roi_sub{iROI});
+    [~, ind_roi_subcortex{iROI}, ~] = intersect(ind, ind_roi_sub{iROI});
 end
 
 for iROI = 1:nROI_cortex
- 
-  [~, ind_roi_cortex{iROI}, ~] = intersect(ind, ind_roi{iROI});
+
+[~, ind_roi_cortex{iROI}, ~] = intersect(ind, ind_roi{iROI});
 end
 
 
 ind_roi_all=cat(2,ind_roi_subcortex,ind_roi_cortex);
+% removeIdx = strcmp(Labels_subcortex, 'Cortex R') | strcmp(Labels_subcortex, 'Cortex L');
+% Mixed_cortex.Atlas(8).Scouts(removeIdx) = [];
+
+% Labels_subcortex= {Mixed_cortex.Atlas(8).Scouts.Label};
+% % number of ROIs in the Desikan-Kiliany Atlas and subcortical 
+% nROI_cortex = length(Mixed_cortex.Atlas(4).Scouts);
+% nROI_subcortex = length(Mixed_cortex.Atlas(8).Scouts);
+% nROI = nROI_subcortex+nROI_cortex;
+
+% ind_subcortex = [];
+% ind_roi_sub= {};
+
+% for iROI = 1:nROI_subcortex
+%       ind_roi_sub{iROI} = Mixed_cortex.Atlas(8).Scouts(iROI).Vertices;
+%       ind_subcortex = cat(2, ind_subcortex, ind_roi_sub{iROI});
+%       % [~, ind_roi_subcortex{iROI}, ~] = intersect(ind_subcortex, ind_roi_sub{iROI});
+% end
+
+% ind_cortex = [];
+% ind_roi = {};
+% for iROI = 1:nROI_cortex
+%   ind_roi{iROI} = Mixed_cortex.Atlas(4).Scouts(iROI).Vertices;
+%   ind_cortex = cat(2, ind_cortex, ind_roi{iROI});
+%   % [~, ind_roi_cortex{iROI}, ~] = intersect(ind_cortex, ind_roi{iROI});
+% end
+
+% ind=cat(2,ind_subcortex,ind_cortex);
+
+% %indices should be extracted from concatination of vertices indices 
+% for iROI = 1:nROI_subcortex
+%       [~, ind_roi_subcortex{iROI}, ~] = intersect(ind, ind_roi_sub{iROI});
+% end
+
+% for iROI = 1:nROI_cortex
+ 
+%   [~, ind_roi_cortex{iROI}, ~] = intersect(ind, ind_roi{iROI});
+% end
+
+
+% ind_roi_all=cat(2,ind_roi_subcortex,ind_roi_cortex);
 
 nROI = nROI_subcortex + nROI_cortex ;
 
@@ -161,6 +210,7 @@ for iROI = 1:nROI
   source_roi_power_total_norm(:, iROI) = source_roi_power_total(:, iROI)/length(ind_roi_all{iROI}); 
   % optional z-scoring - removed
   means=mean(data_(:,:),1);
+  % disp(means)
   for dim=1:size(data_(:,:),2)
     data_(:,dim)=data_(:,dim)-means(dim);
   end

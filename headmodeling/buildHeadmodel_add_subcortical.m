@@ -24,7 +24,7 @@ thick=4;
 asegVertices_1=500;
 asegVertices_2=1250;
 
-protocol_name='addMix';  
+protocol_name='addMix_5000';  
 
 brainstorm  
 
@@ -38,7 +38,7 @@ bst_set('iProtocol', iProtocol)
 
 proto_db = bst_get('ProtocolSubjects');
 
-for isbj=1:length(proto_db.Subject)-1
+for isbj=length(proto_db.Subject)
  tic
     sbj= proto_db.Subject(isbj).Name;
     mkdir([fig_folder sbj])
@@ -110,14 +110,14 @@ TessFiles={newAsegFile, defaultCortex};
 TessFiles2={newAsegFile2, defaultCortex2};
 TessFiles_high={newAsegFile_high, defaultCortex_high};
 
-[mixedFile,iSurface]=tess_concatenate(TessFiles,'Cortex_mix_2000_500','Cortex');
+[mixedFile2,iSurface]=tess_concatenate(TessFiles,'Cortex_mix_2000_500','Cortex');
 [mixedFile2,iSurface]=tess_concatenate(TessFiles2,'Cortex_mix_5000_1250','Cortex');
 [mixedFile_high,iSurface]=tess_concatenate(TessFiles_high,'Cortex_mix_high','Cortex');
     %%
     % Atlas with structures
     atlasName = 'Structures';
     % Display mixed cortex
-    hFigMix = view_surface(mixedFile);
+    hFigMix = view_surface(mixedFile2);
     [~, sSurf] = panel_scout('GetScouts');
     iAtlas = find(strcmpi(atlasName, {sSurf.Atlas.Name}));
     panel_scout('SetCurrentAtlas', iAtlas, 1);
@@ -128,7 +128,7 @@ TessFiles_high={newAsegFile_high, defaultCortex_high};
     bst_memory('UnloadAll', 'Forced');
     %% ===== LOCATIONS AND ORIENTATIONS CONSTRAINTS =====
     % Select atlas with structures
-    panel_scout('SetCurrentSurface', mixedFile);
+    panel_scout('SetCurrentSurface', mixedFile2);
     [~, sSurf] = panel_scout('GetScouts');
     iAtlas = find(strcmpi(atlasName, {sSurf.Atlas.Name}));
     panel_scout('SetCurrentAtlas', iAtlas, 1);
@@ -213,7 +213,7 @@ TessFiles_high={newAsegFile_high, defaultCortex_high};
     sbj_db = bst_get('Subject', isbj_db);
     bst_progress('start', 'Fix cortex surface', 'Loading surfaces...');
     % Load surface file
-    TessMat = in_tess_bst(mixedFile);
+    TessMat = in_tess_bst(mixedFile2);
     TessMat.Faces    = double(TessMat.Faces);
     TessMat.Vertices = double(TessMat.Vertices);
     % Load envelope file
@@ -235,7 +235,7 @@ TessFiles_high={newAsegFile_high, defaultCortex_high};
         disp(['forcing the cortex in the skull for the subject' sbj])
          for isurf = 1:length(sbj_db.Surface)
             if strfind(sbj_db.Surface(isurf).FileName, 'tess_innerskull_bem_1922V.mat')
-               [mixedFile_fixed, iSurface] = tess_force_envelope(mixedFile, sbj_db.Surface(isurf).FileName);
+               [mixedFile_fixed, iSurface] = tess_force_envelope(mixedFile2, sbj_db.Surface(isurf).FileName);
         
             end
          end

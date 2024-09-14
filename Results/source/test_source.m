@@ -29,7 +29,7 @@ for i = 1:numel(dirList)
         %make the data 2d by reshaping
         source_roi_data = reshape(source_roi_data, 1,  size(source_roi_data,1) *size(source_roi_data,2)*size(source_roi_data,3));
         %print the source_roi_data size
-%         source_roi_data=abs(source_roi_data);
+        source_roi_data=abs(source_roi_data);
         disp(size(source_roi_data));
     
         % Append the current source ROI data to the matrix
@@ -39,7 +39,7 @@ for i = 1:numel(dirList)
         %make the data 2d by reshaping
         source_roi_data = reshape(source_roi_data, 1,  size(source_roi_data,1) *size(source_roi_data,2)*size(source_roi_data,3));
         %print the source_roi_data size
-%           source_roi_data=abs(source_roi_data);
+          source_roi_data=abs(source_roi_data);
         disp(size(source_roi_data));
     
         % Append the current source ROI data to the matrix
@@ -49,11 +49,12 @@ for i = 1:numel(dirList)
 end
 end
 % Calculate the covariance matrix
-covarianceMatrix = corrcoef(allSourceData);
-covarianceMatrix = covarianceMatrix (10:18,1:9);
+covarianceMatrix = corrcoef(allSourceData)
+covarianceMatrix (10:18,1:9)
 % Plot the covariance matrix
 figure;
 imagesc(covarianceMatrix);
+colormap hot
 colorbar;
 title('Covariance Matrix - All Source ROI Data');
 
