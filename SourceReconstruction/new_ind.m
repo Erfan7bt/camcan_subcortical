@@ -12,9 +12,7 @@ ind_cortex=[];
 
 for iroi=1:2:68
 ind_roi{iroi}=dk(iroi).Vertices;
-disp(length(ind_roi{iroi}))
 [~,ind_roi{iroi}]=ismember(ind_roi{iroi},leftcortex.Vertices);
-disp(length(ind_roi{iroi}))
 ind_roi{iroi}=leftcortex.GridRows(ind_roi{iroi});
 ind_cortex=cat(2,ind_cortex,ind_roi{iroi});
 end
